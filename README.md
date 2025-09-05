@@ -32,7 +32,7 @@ Inclui os projetos **Elvis Store**, **Guitar Wars** e **MisMatch** (site de rela
 
 1. **Clone o repositório**
    ```bash
-   git clone https://github.com/SEU_USUARIO/use-a-cabeca-php-mysql.git
+   git clone [https://github.com/dmm76/use-a-cabeca-php-mysql.git](https://github.com/dmm76/php_mysql_use_a_cabeca.git)
    ```
 
 ## 💡 Funcionalidades
