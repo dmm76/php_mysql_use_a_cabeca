@@ -4,7 +4,7 @@ class Database
 {
     public function conecta($sql)
     {
-        $bd = mysqli_connect("localhost", "root", "Debase33@", "elvis_store") or die("Erro ao conectar ao banco");
+        $bd = mysqli_connect("localhost", "root", "******", "elvis_store") or die("Erro ao conectar ao banco");
 
         $resp = mysqli_query($bd, $sql) or die("Erro na consulta");
 

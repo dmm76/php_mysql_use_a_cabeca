@@ -3,7 +3,7 @@
 if (isset($_POST['submit'])) {
     // include_once("Ex01/includes/menu.php");
 
-    $bd = mysqli_connect("localhost", "root", "Debase33@", "elvis_store") or die("Erro ao conectar ao banco");
+    $bd = mysqli_connect("localhost", "root", "*******", "elvis_store") or die("Erro ao conectar ao banco");
 
     $from = 'elmer@makeelvis.com';
     $subject = $_POST['subject'];

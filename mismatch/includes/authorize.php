@@ -1,6 +1,6 @@
 <?php
 $username = 'root';
-$password = 'Debase33@';
+$password = '********';
 
 if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || ($_SERVER['PHP_AUTH_USER'] != $username) || ($_SERVER['PHP_AUTH_PW']) != $password) {
     header('HTTP/1.1 401 Unauthorized');

@@ -12,7 +12,7 @@ if (!empty($_COOKIE['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $db = mysqli_connect("localhost", "root", "Debase33@", "mismatch");
+    $db = mysqli_connect("localhost", "root", "********", "mismatch");
 
     if (!$db) {
         $erro_msg = "Erro ao conectar ao banco.";
