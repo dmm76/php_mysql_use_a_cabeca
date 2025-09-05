@@ -1,0 +1,12 @@
+# Ignorar pasta de imagens
+img/
+uploads/
+pictures/
+
+# Ignorar configs com senha
+includes/connectvars.php
+includes/appvars.php
+
+# Outros arquivos comuns
+*.env
+*.log

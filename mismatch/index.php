@@ -3,56 +3,70 @@
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
-/* Se não tem cookie de login, manda para login */
-if (empty($_COOKIE['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
-
-$username = $_COOKIE['username'] ?? '';
-
-//inicia a sesssao
+/** Sessão + cabeçalho **/
 require_once('startsession.php');
-
-//insere o cabeçalho na pagina
 $page_title = 'Onde os opostos se atraem';
 require_once('header.php');
 
 require_once('includes/appvars.php');
 require_once('includes/connectvars.php');
 
-//mostra a menu de navegacao
+/** Navbar (uma única vez) **/
 require_once('navmenu.php');
 
-//conecta ao banco de dados
+/** Conexão DB **/
 $bd = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-//OBTEM OS DADOS DO USUARIO ATRAVEZ DO MYSQL
-$sql = "select user_id, first_name, picture from mismatch_user where first_name is not null order by join_date desc limit 5";
-
-$data = mysqli_query($bd, $sql);
-
-//faz um loop atravez do array de dados formatando com html
-echo '<h4>Membros mais novos:</h4>';
-echo '<table>';
-
-while ($row = mysqli_fetch_array($data)) {
-    if (is_file(MM_UPLOADPATH . $row['picture']) && filesize(MM_UPLOADPATH . $row['picture']) > 0) {
-        echo '<tr><td><img src="' . MM_UPLOADPATH . $row['picture'] . '" alt="' . $row['first_name'] . '"/></td>';
-    } else {
-        echo '<tr><td><img src="' . MM_UPLOADPATH . 'nopic.jpg' . '" alt="' . $row['first_name'] . '"/></td>';
-    }
-    if (isset($_SESSION['user_id'])) {
-        echo '<td><a href="viewprofile.php?user_id=' . $row['user_id'] . '">' . $row['first_name'] . '</a></td></tr>';
-    } else {
-        echo '<td>' . $row['first_name'] . '</td></tr>';
-    }
+if (!$bd) {
+    echo '<main class="container py-4"><div class="alert alert-danger">Erro ao conectar ao banco.</div></main>';
+    require_once('footer.php');
+    exit;
 }
 
-echo '</table>';
+/** Consulta: últimos membros com first_name definido */
+$sql = "SELECT user_id, first_name, picture
+          FROM mismatch_user
+         WHERE first_name IS NOT NULL
+         ORDER BY join_date DESC
+         LIMIT 8";
+$data = mysqli_query($bd, $sql);
 ?>
-<?php
-//insere o rodape
 
+<main class="container-lg flex-grow-1 py-5">
+    <h4 class="mb-3">Membros mais novos</h4>
+
+    <?php if ($data && mysqli_num_rows($data) > 0): ?>
+        <div class="row g-3">
+            <?php while ($row = mysqli_fetch_assoc($data)):
+                $first = htmlspecialchars($row['first_name']);
+                $uid   = (int)$row['user_id'];
+                $pic   = $row['picture'] ?? '';
+                $imgPath = (is_file(MM_UPLOADPATH . $pic) && filesize(MM_UPLOADPATH . $pic) > 0)
+                    ? (MM_UPLOADPATH . $pic)
+                    : (MM_UPLOADPATH . 'nopic.jpg');
+            ?>
+                <div class="col-6 col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="<?= htmlspecialchars($imgPath) ?>" class="card-img-top" alt="<?= $first ?>">
+                        <div class="card-body">
+                            <h6 class="card-title mb-2"><?= $first ?></h6>
+                            <?php if (!empty($_SESSION['user_id'])): ?>
+                                <a class="btn btn-sm btn-outline-primary" href="viewprofile.php?user_id=<?= $uid ?>">Ver perfil</a>
+                            <?php else: ?>
+                                <a class="btn btn-sm btn-primary w-100" href="login.php">Fazer login</a>
+
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-info">Ainda não há membros para exibir.</div>
+    <?php endif; ?>
+</main>
+
+<?php
+if ($bd) {
+    mysqli_close($bd);
+}
 require_once('footer.php');
-?>

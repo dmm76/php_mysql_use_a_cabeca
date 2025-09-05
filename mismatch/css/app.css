@@ -1,0 +1,102 @@
+:root {
+  --brand-1: #6f42c1; /* roxo bonito */
+  --brand-2: #8a63d2;
+  --brand-3: #f3f0ff; /* lilás bem claro p/ hero */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1; /* ocupa espaço entre nav e footer */
+  padding-top: 2rem; /* respiro em cima */
+  padding-bottom: 2rem; /* respiro embaixo */
+}
+
+/* Navbar gradiente */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+}
+
+/* Hero band */
+.hero-band {
+  background: radial-gradient(
+      1200px 300px at 10% -20%,
+      var(--brand-2) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      1200px 300px at 90% -30%,
+      var(--brand-1) 0%,
+      transparent 60%
+    ),
+    var(--brand-3);
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Cards */
+.card {
+  border: 0;
+  border-radius: 1rem;
+}
+.card .card-img-top {
+  height: 280px; /* todas com a mesma altura */
+  object-fit: cover; /* corta proporcional */
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Avatar */
+.avatar-lg {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Footer */
+.footer {
+  margin-top: auto; /* cola no fim da tela */
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 0;
+}
+
+/* Botões */
+.btn-primary {
+  background-color: var(--brand-1);
+  border-color: var(--brand-1);
+}
+.btn-primary:hover {
+  background-color: #59339f;
+  border-color: #59339f;
+}
+
+/* Tabelas e listas */
+.table {
+  background: #fff;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.list-group .list-group-item {
+  border: 1px solid #eef2f7;
+}

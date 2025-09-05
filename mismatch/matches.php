@@ -1,78 +1,102 @@
 <?php
-session_start();
-if (empty($_COOKIE['user_id'])) {
-    header('Location: login.php');
+/* Evita cache */
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+
+require_once('startsession.php');
+$page_title = 'Seus MisMatches';
+require_once('header.php');
+
+require_once('includes/appvars.php');
+require_once('includes/connectvars.php');
+require_once('navmenu.php');
+
+/* exige login */
+if (empty($_SESSION['user_id'])) {
+    echo '<div class="container py-4"><div class="alert alert-warning">Faça login para ver seus MisMatches.</div></div>';
+    require_once('footer.php');
     exit;
 }
-$userId = (int)$_COOKIE['user_id'];
-require 'db.php';
 
-/* 
-Score = soma de respostas onde eles discordam:
-- r1 = respostas de OUTROS usuários
-- r2 = SUAS respostas
-*/
+/* Conexão */
+$bd = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+if (!$bd) {
+    echo '<div class="container py-4"><div class="alert alert-danger">Erro ao conectar ao banco.</div></div>';
+    require_once('footer.php');
+    exit;
+}
+mysqli_set_charset($bd, 'utf8mb4');
+
+$user_id = (int)$_SESSION['user_id'];
+
+/* Ranking de diferenças (XOR) */
 $sql = "
-SELECT u.user_id, u.username,
+SELECT u.user_id,
+       u.username,
        SUM(r1.response XOR r2.response) AS mismatch_score,
        COUNT(*) AS total_topics
-FROM mismatch_response r2
-JOIN mismatch_response r1
-  ON r1.topic_id = r2.topic_id
-JOIN mismatch_user u
-  ON u.user_id = r1.user_id
-WHERE r2.user_id = ?
-  AND r1.user_id <> ?
-GROUP BY u.user_id, u.username
+  FROM mismatch_response r2
+  JOIN mismatch_response r1
+    ON r1.topic_id = r2.topic_id
+  JOIN mismatch_user u
+    ON u.user_id = r1.user_id
+ WHERE r2.user_id = ?
+   AND r1.user_id <> ?
+ GROUP BY u.user_id, u.username
 HAVING total_topics > 0
-ORDER BY mismatch_score DESC, total_topics DESC, u.username ASC
-LIMIT 20";
+ ORDER BY mismatch_score DESC, total_topics DESC, u.username ASC
+ LIMIT 50";
 
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param('ii', $userId, $userId);
-$stmt->execute();
-$res = $stmt->get_result();
+$stmt = mysqli_prepare($bd, $sql);
+mysqli_stmt_bind_param($stmt, 'ii', $user_id, $user_id);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
 ?>
-<!doctype html>
-<html lang="pt-br">
+<div class="container py-4">
+    <h4 class="mb-3">Seus melhores “opostos”</h4>
 
-<head>
-    <meta charset="utf-8">
-    <title>Seus MisMatches</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body class="bg-light">
-    <div class="container py-4">
-        <h1 class="h4 mb-3">Seus melhores “opostos”</h1>
-
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead>
+    <?php if ($res && mysqli_num_rows($res) > 0): ?>
+        <div class="table-responsive card shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
                         <th>Usuário</th>
                         <th>Diferenças</th>
-                        <th>Respondidos em comum</th>
+                        <th>Tópicos em comum</th>
                         <th>% Diferenças</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($row = $res->fetch_assoc()):
-                        $pct = $row['total_topics'] ? round(100 * $row['mismatch_score'] / $row['total_topics']) : 0; ?>
+                    <?php while ($row = mysqli_fetch_assoc($res)):
+                        $score = (int)$row['mismatch_score'];
+                        $total = (int)$row['total_topics'];
+                        $pct   = $total ? round(100 * $score / $total) : 0;
+                    ?>
                         <tr>
                             <td><?= htmlspecialchars($row['username']) ?></td>
-                            <td><?= (int)$row['mismatch_score'] ?></td>
-                            <td><?= (int)$row['total_topics'] ?></td>
+                            <td><?= $score ?></td>
+                            <td><?= $total ?></td>
                             <td><?= $pct ?>%</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary"
+                                    href="viewprofile.php?user_id=<?= (int)$row['user_id'] ?>">
+                                    Ver perfil
+                                </a>
+                            </td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
-
-        <a class="btn btn-outline-secondary" href="responder.php">Editar preferências</a>
-        <a class="btn btn-outline-primary ms-2" href="index.php">Home</a>
-    </div>
-</body>
-
-</html>
+    <?php else: ?>
+        <div class="alert alert-info">
+            Responda alguns tópicos em <a href="responder.php">Preferências</a> para ver seus MisMatches!
+        </div>
+    <?php endif; ?>
+</div>
+<?php
+if ($res) mysqli_free_result($res);
+mysqli_stmt_close($stmt);
+mysqli_close($bd);
+require_once('footer.php');

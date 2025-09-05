@@ -21,5 +21,5 @@ session_destroy();
 unset($_COOKIE['user_id'], $_COOKIE['username']);
 
 /* Redireciona ao login */
-header('Location: login.php?msg=Você saiu do sistema.');
+header('Location: index.php?msg=Você saiu do sistema.');
 exit;

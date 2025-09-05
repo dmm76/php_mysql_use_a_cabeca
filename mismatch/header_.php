@@ -1,6 +1,6 @@
 <?php
 if (!isset($page_title)) $page_title = 'MisMatch';
-$base = rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); // pega caminho relativo da URL
+$base = rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); // ex.: /php_use_a_cabeca/mismatch
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -9,15 +9,8 @@ $base = rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); // pega caminho relativo da
     <meta charset="utf-8">
     <title><?= htmlspecialchars($page_title) ?> — MisMatch</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Fonte bonita -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Seu CSS global -->
-    <link rel="stylesheet" href="<?= $base ?>/css/app.css">
+    <link rel="stylesheet" href="<?= $base ?>/css/app.css"> <!-- 👈 caminho relativo correto -->
 </head>
 
-<body class="d-flex flex-column min-vh-100 bg-body">
+<body class="bg-body">
